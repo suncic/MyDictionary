@@ -1,0 +1,15 @@
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/bin/Debug/net9.0/MyDictionary
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/bin/Debug/net9.0/MyDictionary.deps.json
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/bin/Debug/net9.0/MyDictionary.runtimeconfig.json
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/bin/Debug/net9.0/MyDictionary.dll
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/bin/Debug/net9.0/MyDictionary.pdb
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/obj/Debug/net9.0/MyDictionary.GeneratedMSBuildEditorConfig.editorconfig
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/obj/Debug/net9.0/MyDictionary.AssemblyInfoInputs.cache
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/obj/Debug/net9.0/MyDictionary.AssemblyInfo.cs
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/obj/Debug/net9.0/MyDictionary.csproj.CoreCompileInputs.cache
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/obj/Debug/net9.0/MyDictionary.sourcelink.json
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/obj/Debug/net9.0/MyDictionary.dll
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/obj/Debug/net9.0/refint/MyDictionary.dll
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/obj/Debug/net9.0/MyDictionary.pdb
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/obj/Debug/net9.0/MyDictionary.genruntimeconfig.cache
+/Users/macbookpro/Desktop/Projekti/Nokturno/MyDictionary/obj/Debug/net9.0/ref/MyDictionary.dll
