@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 class MySimpleDictionary<TKey, TValue> : IMySimpleDictionary<TKey, TValue>
 {
-    //otvoreno hesovanje
     private static int SIZE = 101;
     private int count = 0;
     private IEqualityComparer<TKey> comparer = EqualityComparer<TKey>.Default;
@@ -98,7 +97,6 @@ class MySimpleDictionary<TKey, TValue> : IMySimpleDictionary<TKey, TValue>
 
         if (SearchColissionChain(key, hashValue) != null)
         {
-            // kljuc postoji
             return false;
         }
 
@@ -134,7 +132,6 @@ class MySimpleDictionary<TKey, TValue> : IMySimpleDictionary<TKey, TValue>
         return SearchColissionChain(key, Hash(key)) != null;
     }
 
-    // bolje resenje ako dodam hashset
     public bool ContainsValue(TValue value)
     {
         for (int i = 0; i < table.Length; i++)
