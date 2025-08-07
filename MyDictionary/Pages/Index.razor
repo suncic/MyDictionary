@@ -1,0 +1,66 @@
+@using MudBlazor
+@using System.Collections.Generic
+@inject IMySimpleDictionary<string, string> Dictionary
+@inject NavigationManager Navigation
+@page "/view"
+
+
+<MudPaper Class="m-4 p-4">
+
+    <MudText Typo="Typo.h5" Class="mb-2">Dictionary</MudText>
+
+    <MudDataGrid Items="@Items" Hover="true" Striped="true" Bordered="true" Dense="true">
+    <Columns>
+        <TemplateColumn Title="Key">
+            <CellTemplate Context="entry">
+                @entry.Item.Key
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Value">
+            <CellTemplate Context="entry">
+                @entry.Item.Value
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Action">
+            <CellTemplate Context="entry">
+                <MudButton Color="Color.Error" Variant="Variant.Filled" Size="Size.Small" OnClick="@(() => RemoveItem(entry.Item.Key))">
+                    Remove
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+    <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="ClearAll" Class="mt-4">
+        Clear
+    </MudButton>
+
+    <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="@(() => Navigation.NavigateTo("/"))" Class="mt-4">
+        Back to Start
+    </MudButton>
+
+</MudPaper>
+
+@code {
+    private List<DictionaryEntry> Items => Dictionary.GetAllItems()
+        .Select(kv => new DictionaryEntry { Key = kv.Key, Value = kv.Value })
+        .ToList();
+
+    public class DictionaryEntry
+    {
+        public string Key { get; set; } = "";
+        public string Value { get; set; } = "";
+    }
+
+    private void RemoveItem(string key)
+    {
+        Dictionary.Remove(key);
+        StateHasChanged();
+    }
+
+    private void ClearAll()
+    {
+        Dictionary.Clear();
+        StateHasChanged();
+    }
+}

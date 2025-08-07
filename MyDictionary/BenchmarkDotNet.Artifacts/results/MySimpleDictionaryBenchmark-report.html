@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>MySimpleDictionaryBenchmark-20250807-144244</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.2, macOS Monterey 12.7.6 (21H1320) [Darwin 21.6.0]
+Intel Core i5-5257U CPU 2.70GHz (Broadwell), 1 CPU, 4 logical and 2 physical cores
+.NET SDK 9.0.304
+  [Host]     : .NET 8.0.19 (8.0.1925.36514), X64 RyuJIT AVX2
+  DefaultJob : .NET 8.0.19 (8.0.1925.36514), X64 RyuJIT AVX2
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method    </th><th>N</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th>
+</tr>
+</thead><tbody><tr><td>GetExistingKey</td><td>1000</td><td>21.80 ns</td><td>0.992 ns</td><td>2.847 ns</td><td>20.53 ns</td>
+</tr><tr><td>CheckContainsKey</td><td>1000</td><td>28.71 ns</td><td>1.647 ns</td><td>4.480 ns</td><td>26.61 ns</td>
+</tr><tr><td>RemoveKey</td><td>1000</td><td>19.20 ns</td><td>0.078 ns</td><td>0.065 ns</td><td>19.18 ns</td>
+</tr><tr><td>GetExistingKey</td><td>10000</td><td>22.42 ns</td><td>1.105 ns</td><td>3.026 ns</td><td>21.49 ns</td>
+</tr><tr><td>CheckContainsKey</td><td>10000</td><td>140.10 ns</td><td>0.838 ns</td><td>1.354 ns</td><td>139.60 ns</td>
+</tr><tr><td>RemoveKey</td><td>10000</td><td>232.38 ns</td><td>0.522 ns</td><td>0.436 ns</td><td>232.30 ns</td>
+</tr></tbody></table>
+</body>
+</html>

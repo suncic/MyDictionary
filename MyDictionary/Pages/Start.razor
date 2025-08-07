@@ -1,0 +1,44 @@
+@page "/"
+@inject IMySimpleDictionary<string, string> Dictionary
+@inject NavigationManager Navigation
+@using MudBlazor
+
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex flex-column align-center justify-center mt-12">
+    <MudPaper Elevation="4" Class="p-6 d-flex flex-column" Style="width: 100%; align-items: center;">
+
+        <div class="d-flex align-center mb-4">
+            <MudText Typo="Typo.subtitle1" Class="mr-2" Style="min-width: 60px;">Key:</MudText>
+            <MudTextField @bind-Value="key" Variant="Variant.Filled" Style="width: 200px;" />
+        </div>
+
+        <div class="d-flex align-center mb-4">
+            <MudText Typo="Typo.subtitle1" Class="mr-2" Style="min-width: 60px;">Value:</MudText>
+            <MudTextField @bind-Value="value" Variant="Variant.Filled" Style="width: 200px;" />
+        </div>
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddItem" Class="mb-2">
+            Add
+        </MudButton>
+
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="@(() => Navigation.NavigateTo("/view"))">
+            Show Dictionary
+        </MudButton>
+
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private string? key;
+    private string? value;
+
+    private void AddItem()
+    {
+        if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(value))
+        {
+            Dictionary.Add(key, value);
+            key = string.Empty;
+            value = string.Empty;
+        }
+    }
+}
