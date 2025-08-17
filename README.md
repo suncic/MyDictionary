@@ -4,12 +4,12 @@ IZMENE I UNAPREDJENJA
 - Optimizacija postojećih metoda i ispravka Hash metode (kontrola negativnih vrednosti).
 - Proširen interfejs IMySimpleDictionary<TKey, TValue> – sada nasleđuje IEnumerable<KeyValuePair<TKey, TValue>> radi podrške foreach petljama i LINQ-u.
 - Dodate metode koje imitiraju ponašanje ugrađenog Dictionary<TKey, TValue> u .NET-u:
-    void CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
-    void Add(KeyValuePair<TKey, TValue> item)
-    bool Contains(KeyValuePair<TKey, TValue> item)
-    bool Remove(KeyValuePair<TKey, TValue> item)
-    bool TryAdd(TKey key, TValue value)
-    bool TryGetValue(TKey key, out TValue value)
+    * void CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
+    * void Add(KeyValuePair<TKey, TValue> item)
+    * bool Contains(KeyValuePair<TKey, TValue> item)
+    * bool Remove(KeyValuePair<TKey, TValue> item)
+    * bool TryAdd(TKey key, TValue value)
+    * bool TryGetValue(TKey key, out TValue value)
 - Generalna poboljšanja koda radi bolje čitljivosti i robusnosti.
 
 U ovoj implementaciji odlucila sam se protiv zatvorenog hesiranja, iako ge .NET Dictionary<K, V> koristi za hesiranje, iz sledecih razloga:
