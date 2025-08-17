@@ -3,7 +3,7 @@ using MudBlazor;
 using BenchmarkDotNet.Running;
 
 var builder = WebApplication.CreateBuilder(args);
-BenchmarkRunner.Run<MySimpleDictionaryBenchmark>();
+//BenchmarkRunner.Run<MySimpleDictionaryBenchmark>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

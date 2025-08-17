@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 class MySimpleDictionary<TKey, TValue> : IMySimpleDictionary<TKey, TValue>
 {
-    private static int SIZE = 101;
+    private const double LOAD_FACTOR = 0.75;
     private int count = 0;
     private IEqualityComparer<TKey> comparer = EqualityComparer<TKey>.Default;
     private IEqualityComparer<TValue> valueComparer = EqualityComparer<TValue>.Default;
@@ -24,29 +26,34 @@ class MySimpleDictionary<TKey, TValue> : IMySimpleDictionary<TKey, TValue>
     }
 
     private Node[] table;
-    public MySimpleDictionary() : this(SIZE) { }
+    public IEqualityComparer<TKey> Comparer => comparer;
+    public MySimpleDictionary() : this(101, EqualityComparer<TKey>.Default) { }
 
-    public MySimpleDictionary(int capacity)
+    public MySimpleDictionary(int capacity) : this(capacity, EqualityComparer<TKey>.Default)
     {
         if (capacity <= 0)
         {
             throw new ArgumentException("Capacity must be greater than zero.");
         }
-
-        table = new Node[capacity];
     }
 
-    public MySimpleDictionary(IEqualityComparer<TKey> comparer) : this(SIZE)
+    public MySimpleDictionary(int size, IEqualityComparer<TKey> comparer)
     {
+        if (size <= 0)
+        {
+            throw new ArgumentException("Size must be greater than zero.", nameof(size));
+        }
         if (comparer == null)
         {
             throw new ArgumentNullException(nameof(comparer));
         }
 
+        table = new Node[size];
         this.comparer = comparer;
     }
 
-    public MySimpleDictionary(IDictionary<TKey, TValue> other) : this(SIZE)
+    public MySimpleDictionary(IDictionary<TKey, TValue> other, IEqualityComparer<TKey> comparer) 
+        : this(other?.Count ?? 0, comparer)
     {
         if (other == null)
         {
@@ -55,8 +62,14 @@ class MySimpleDictionary<TKey, TValue> : IMySimpleDictionary<TKey, TValue>
 
         foreach (var pair in other)
         {
-            this.Add(pair.Key, pair.Value);
+            Add(pair.Key, pair.Value);
         }
+    }
+
+    public MySimpleDictionary(IDictionary<TKey, TValue> other) 
+        : this(other, EqualityComparer<TKey>.Default)
+    {
+        
     }
 
     private int Hash(TKey key)
@@ -66,36 +79,58 @@ class MySimpleDictionary<TKey, TValue> : IMySimpleDictionary<TKey, TValue>
             throw new ArgumentNullException(nameof(key), "Key cannot be null.");
         }
 
-        return Math.Abs(key.GetHashCode() % table.Length);
+        return (key.GetHashCode() & 0x7FFFFFFF) % table.Length;
     }
 
-    private Node[] SearchColissionChain(TKey Key, int hashValue)
+    private bool SearchColissionChain(TKey Key, int hashValue, out Node current, out Node previous)
     {
-        Node current = table[hashValue];
-        Node previous = null;
+        current = table[hashValue];
+        previous = null;
 
         while (current != null)
         {
             if (comparer.Equals(current.key, Key))
             {
-                Node[] n = new Node[2];
-                n[0] = current;
-                n[1] = previous;
-                return n;
+                return true;
             }
 
             previous = current;
             current = current.next;
         }
 
-        return null;
+        return false;
     }
 
-    public bool Add(TKey key, TValue value)
+    public void Add(TKey key, TValue value)
     {
+        if ((double)count / table.Length > LOAD_FACTOR)
+        {
+            Resize();
+        }
+
         int hashValue = Hash(key);
 
-        if (SearchColissionChain(key, hashValue) != null)
+        if (SearchColissionChain(key, hashValue, out var current, out _))
+        {
+            throw new ArgumentException("Key already exists in the dictionary.", nameof(key));
+        }
+
+        Node newNode = new Node(key, value);
+        newNode.next = table[hashValue];
+        table[hashValue] = newNode;
+        count++;
+    }
+
+    public bool TryAdd(TKey key, TValue value)
+    {
+        if ((double)count / table.Length > LOAD_FACTOR)
+        {
+            Resize();
+        }
+
+        int hashValue = Hash(key);
+
+        if (SearchColissionChain(key, hashValue, out var current, out _))
         {
             return false;
         }
@@ -107,107 +142,136 @@ class MySimpleDictionary<TKey, TValue> : IMySimpleDictionary<TKey, TValue>
         return true;
     }
 
+    private static int GetNextPrime(int n)
+    {
+        if (n <= 2)
+            return 2;
+
+        if (n % 2 == 0)
+            n++;
+
+        while (!IsPrime(n))
+        {
+            n += 2;
+        }
+        return n;
+    }
+
+    private static bool IsPrime(int n)
+    {
+        if (n < 2) return false;
+        if (n == 2) return true;
+        if (n % 2 == 0) return false;
+
+        int sqrt = (int)Math.Sqrt(n);
+        for (int i = 3; i <= sqrt; i += 2)
+        {
+            if (n % i == 0)
+                return false;
+        }
+        return true;
+    }
+
+    private void Resize()
+    {
+        int newSize = GetNextPrime(table.Length * 2);
+        var newTable = new Node[newSize];
+        foreach (var pair in this)
+        {
+            int hash = (pair.Key.GetHashCode() & 0x7FFFFFFF) % newTable.Length;
+            Node newNode = new Node(pair.Key, pair.Value);
+            newNode.next = newTable[hash];
+            newTable[hash] = newNode;
+        }
+        table = newTable;
+    }
+
     public TValue Get(TKey key)
     {
         int hashValue = Hash(key);
-
-        Node[] n = SearchColissionChain(key, hashValue);
-        if (n == null)
+        if (SearchColissionChain(key, hashValue, out var current, out var previous))
         {
-            return default(TValue);
+            if (current != table[hashValue])
+            {
+                previous.next = current.next;
+                current.next = table[hashValue];
+                table[hashValue] = current;
+            }
+            return current.value;
         }
 
-        // LRU strategija
-        if (n[0] != table[hashValue])
-        {
-            n[1].next = n[0].next;
-            n[0].next = table[hashValue];
-            table[hashValue] = n[0];
-        }
-
-        return n[0].value;
+        throw new KeyNotFoundException("Key not found: " + key);
     }
-    public bool ContainsKey(TKey key)
+
+
+    public bool TryGetValue(TKey key, out TValue value)
     {
-        return SearchColissionChain(key, Hash(key)) != null;
+        int hashValue = Hash(key);
+        if (SearchColissionChain(key, hashValue, out var current, out _))
+        {
+            value = current.value;
+            return true;
+        }
+        value = default(TValue);
+        return false;
     }
+    public bool ContainsKey(TKey key) => SearchColissionChain(key, Hash(key), out _, out _);
 
     public bool ContainsValue(TValue value)
     {
-        for (int i = 0; i < table.Length; i++)
+        foreach (var pair in this)
         {
-            Node current = table[i];
-            while (current != null)
+            if (valueComparer.Equals(pair.Value, value))
             {
-                if (valueComparer.Equals(current.value, value))
-                {
-                    return true;
-                }
-
-                current = current.next;
+                return true;
             }
-
         }
-
         return false;
     }
 
-    public int Count
-    {
-        get { return count; }
-    }
+    public int Count => count;
 
     public bool Remove(TKey key)
     {
         int hashValue = Hash(key);
-
-        Node[] n = SearchColissionChain(key, hashValue);
-        if (n == null)
+        if (SearchColissionChain(key, hashValue, out var current, out var previous))
         {
-            return false;
-        }
+            if (current == table[hashValue])
+            {
+                table[hashValue] = current.next;
+            }
+            else
+            {
+                previous.next = current.next;
+            }
 
-        if (n[0] == table[hashValue])
-        {
-            table[hashValue] = table[hashValue].next;
+            count--;
+            return true;
         }
-        else
-        {
-            n[1].next = n[0].next;
-        }
-        count--;
-
-        return true;
+        return false;
     }
 
     public void Clear()
     {
-        for (int i = 0; i < table.Length; i++)
-        {
-            table[i] = null;
-        }
+        Array.Clear(table, 0, table.Length);
         count = 0;
-    }
-
-    private void Modify(TKey key, TValue value)
-    {
-        int hashValue = Hash(key);
-
-        Node[] n = SearchColissionChain(key, hashValue);
-        if (n[0] != null)
-        {
-            n[0].value = value;
-        }
-        else
-        {
-            Add(key, value);
-        }
     }
 
     public TValue this[TKey key]
     {
-        get { return Get(key); }
-        set { Modify(key, value); }
+        get => Get(key);
+        set
+        {
+            int hashValue = Hash(key);
+            if (SearchColissionChain(key, hashValue, out var current, out _))
+            {
+                current.value = value;
+            }
+            else
+            {
+                Add(key, value);
+            }
+        }
     }
 
     public IEnumerable<KeyValuePair<TKey, TValue>> GetAllItems()
@@ -223,40 +287,77 @@ class MySimpleDictionary<TKey, TValue> : IMySimpleDictionary<TKey, TValue>
         }
     }
 
-    public ICollection<TKey> Keys
+    public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
     {
-        get
+        return GetAllItems().GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    public void CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
+    {
+        if (array == null)
         {
-            var keys = new List<TKey>();
-            for (int i = 0; i < table.Length; i++)
-            {
-                Node current = table[i];
-                while (current != null)
-                {
-                    keys.Add(current.key);
-                    current = current.next;
-                }
-            }
-            return keys;
+            throw new ArgumentNullException(nameof(array), "Array cannot be null.");
+        }
+        if (index < 0 || index >= array.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+        }
+        if (array.Length - index < Count)
+        {
+            throw new ArgumentException("The number of elements in the source dictionary is greater than the available space from index to the end of the destination array.");
+        }
+
+        foreach(var pair in this)
+        {
+            array[index++] = pair;
         }
     }
 
-    public ICollection<TValue> Values
+    public void Add(KeyValuePair<TKey, TValue> item)
+    {
+        Add(item.Key, item.Value);
+    }
+
+    public bool Contains(KeyValuePair<TKey, TValue> item)
+    {
+        return GetAllItems().Any(pair =>
+            comparer.Equals(pair.Key, item.Key) &&
+                valueComparer.Equals(pair.Value, item.Value));
+    }
+
+    public bool Remove(KeyValuePair<TKey, TValue> item)
+    {
+        if (Contains(item))
+        {
+            return Remove(item.Key);
+        }
+        return false;
+    }
+
+    public IEnumerable<TKey> Keys
     {
         get
         {
-            var values = new HashSet<TValue>();
-            for (int i = 0; i < table.Length; i++)
+            foreach (var pair in this)
             {
-                Node current = table[i];
-                while (current != null)
-                {
-                    values.Add(current.value);
-                    current = current.next;
-                }
+                yield return pair.Key;
             }
+        }
+    }
 
-            return values.ToList();
+    public IEnumerable<TValue> Values
+    {
+        get
+        {
+            foreach (var pair in this)
+            {
+                yield return pair.Value;
+            }
         }
     }
 }

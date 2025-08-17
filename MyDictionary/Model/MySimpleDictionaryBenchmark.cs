@@ -35,7 +35,7 @@ public class MySimpleDictionaryBenchmark
             throw new InvalidOperationException("Dictionary is not initialized.");
         }
 
-        return dictionary.Get(keyToSearch);
+        return dictionary[keyToSearch];
     }
 
     [Benchmark]
@@ -54,8 +54,41 @@ public class MySimpleDictionaryBenchmark
         if (dictionary == null)
         {
             throw new InvalidOperationException("Dictionary is not initialized.");
-        } 
-        
+        }
+
         return dictionary.Remove(keyToSearch);
+    }
+
+    [Benchmark]
+    public void IterateKeys()
+    {
+        if (dictionary == null)
+            throw new InvalidOperationException("Dictionary is not initialized.");
+
+        foreach (var key in dictionary.Keys)
+        {
+
+        }
+    }
+
+    [Benchmark]
+    public void IterateValues()
+    {
+        if (dictionary == null)
+            throw new InvalidOperationException("Dictionary is not initialized.");
+
+        foreach (var value in dictionary.Values)
+        {
+
+        }
+    }
+    
+    [Benchmark]
+    public int CountItems()
+    {
+        if (dictionary == null)
+            throw new InvalidOperationException("Dictionary is not initialized.");
+
+        return dictionary.Count;
     }
 }
