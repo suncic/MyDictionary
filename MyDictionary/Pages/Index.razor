@@ -42,15 +42,16 @@
 </MudPaper>
 
 @code {
-    private List<DictionaryEntry> Items => Dictionary.GetAllItems()
-        .Select(kv => new DictionaryEntry { Key = kv.Key, Value = kv.Value })
-        .ToList();
-
-    public class DictionaryEntry
+    public class MyDictionaryEntry
     {
-        public string Key { get; set; } = "";
+         public string Key { get; set; } = "";
         public string Value { get; set; } = "";
     }
+
+    private List<MyDictionaryEntry> Items => Dictionary.GetAllItems()
+    .Select(kv => new MyDictionaryEntry { Key = kv.Key, Value = kv.Value })
+    .ToList();
+
 
     private void RemoveItem(string key)
     {

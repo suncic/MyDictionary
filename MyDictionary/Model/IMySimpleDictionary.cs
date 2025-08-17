@@ -20,6 +20,7 @@ public interface IMySimpleDictionary<TKey, TValue>
     IEnumerable<TKey> Keys { get; }
     IEnumerable<TValue> Values { get; }
     IEqualityComparer<TKey> Comparer { get; }
+    IEnumerable<KeyValuePair<TKey, TValue>> GetAllItems();
 
     void CopyTo(KeyValuePair<TKey, TValue>[] array, int index);
     void Add(KeyValuePair<TKey, TValue> item);
