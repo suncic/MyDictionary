@@ -1,16 +1,16 @@
 IZMENE I UNAPREDJENJA
 -----------------------
-- Dodato upravljanje faktorom zasićenosti (load factor) – za bolje performanse pri radu sa velikim duzinama lanaca kolizije.
-- Optimizacija postojećih metoda i ispravka Hash metode (kontrola negativnih vrednosti).
-- Proširen interfejs IMySimpleDictionary<TKey, TValue> – sada nasleđuje IEnumerable<KeyValuePair<TKey, TValue>> radi podrške foreach petljama i LINQ-u.
-- Dodate metode koje imitiraju ponašanje ugrađenog Dictionary<TKey, TValue> u .NET-u:
+- Dodato upravljanje faktorom zasicenosti (load factor) – za bolje performanse pri radu sa velikim duzinama lanaca kolizije.
+- Optimizacija postojecih metoda i ispravka Hash metode (kontrola negativnih vrednosti).
+- Prosiren interfejs IMySimpleDictionary<TKey, TValue> – sada nasleđuje IEnumerable<KeyValuePair<TKey, TValue>> radi podrske foreach petljama i LINQ-u.
+- Dodate metode koje imitiraju ponasanje ugrađenog Dictionary<TKey, TValue> u .NET-u:
     * void CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
     * void Add(KeyValuePair<TKey, TValue> item)
     * bool Contains(KeyValuePair<TKey, TValue> item)
     * bool Remove(KeyValuePair<TKey, TValue> item)
     * bool TryAdd(TKey key, TValue value)
     * bool TryGetValue(TKey key, out TValue value)
-- Generalna poboljšanja koda radi bolje čitljivosti i robusnosti.
+- Generalna poboljsanja koda radi bolje citljivosti i robusnosti.
 
 U ovoj implementaciji odlucila sam se protiv zatvorenog hesiranja, iako ge .NET Dictionary<K, V> koristi za hesiranje, iz sledecih razloga:
 
